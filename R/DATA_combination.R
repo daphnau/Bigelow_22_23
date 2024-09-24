@@ -5,6 +5,8 @@ dir()
 setwd("C:/Users/dafna/Desktop/Bigelow_22_23/data/raw_data")
 ##work##
 setwd("C:/Users/Daphnau/Box/Daphna Uni/Bigelow/all toghther/ORIGINAL DATA")
+
+
 dir()
 install.packages(tidyr)
 library(tidyr)
@@ -25,7 +27,8 @@ source("C:/Users/dafna/Box/Daphna Uni/Bigelow/source/round.POSIXct.R")
 
 ##sap flow ### 2022###
 custom_headers_ <- c("time", "Average_SWP",  "Average_PP","Average_DF") 
-sf_data_2022 <- read.csv('MB_SapFlow_SpeciesAverage_2022.csv', header = FALSE, col.names = custom_headers_, sep = ',')
+#sf_data_2022 <- read.csv('MB_SapFlow_SpeciesAverage_2022.csv', header = FALSE, col.names = custom_headers_, sep = ',')
+sf_data_2022 <- read.csv("data/raw_data/MB_SapFlow_SpeciesAverage_2022.csv", header = FALSE, col.names = custom_headers_, sep = ',')
 
 #####changing column 1 to date and time####
 doy<- floor(sf_data_2022$time)
@@ -39,7 +42,7 @@ sf_data_2022$date_time<-ymd_hms(paste0(date_stamp," ", time_stamp))
 sf_data_2022$date_time_round<- round.POSIXct(sf_data_2022$date_time,"30 min")
 
 ##sap flow### 2023
-sf_data_2023 <- read.csv('MB_SapFlow_SpeciesAverage_2023.csv', header = FALSE, col.names = custom_headers_, sep = ',')
+sf_data_2023 <- read.csv("data/raw_data/MB_SapFlow_SpeciesAverage_2023.csv", header = FALSE, col.names = custom_headers_, sep = ',')
 #####changing column 1 to date and time####
 doy<- floor(sf_data_2023$time)
 min_fraction<-sf_data_2023$time-doy
@@ -65,9 +68,9 @@ sf_data<- sf_data%>%
 ##########################################################################################
 
 ####TOWER DATA####
-tower_data_2022 <- read.csv('GapfilledPartitionedFluxes_US-Mtb_HH_202201010000_202301010000.csv', sep = ',',
+tower_data_2022 <- read.csv("data/raw_data/GapfilledPartitionedFluxes_US-Mtb_HH_202201010000_202301010000.csv", sep = ',',
                             na.strings = c("-9999", "-9999.000"))
-tower_data_2023 <- read.csv('GapfilledPartitionedFluxes_US-Mtb_HH_202301010000_202401010000.csv', sep = ',',
+tower_data_2023 <- read.csv("data/raw_data/GapfilledPartitionedFluxes_US-Mtb_HH_202301010000_202401010000.csv", sep = ',',
                             na.strings = c("-9999", "-9999.000"))
 tower_data_2022$TIMESTAMP_START <- ymd_hm(tower_data_2022$TIMESTAMP_START)
 tower_data_2023$TIMESTAMP_START <- ymd_hm(tower_data_2023$TIMESTAMP_START)      
@@ -115,8 +118,8 @@ tower_data_selected<- tower_data %>% select(Time, TA_1_3_1, TA_1_4_1,RH_1_3_1, R
 ###THERMAL DATA###
 ##############adding thremal to sapflow and tower data####sf_flux_daytime_mo
 dir()
-thermal_2022_AD <- read.csv('thermal_AD__22.csv', sep = ','   )    
-thermal_2023_AD <- read.csv('thermal_AD__23.csv', sep = ','   )
+thermal_2022_AD <- read.csv("data/raw_data/thermal_AD__22.csv", sep = ','   )    
+thermal_2023_AD <- read.csv("data/raw_data/thermal_AD__23.csv", sep = ','   )
 thermal_ad<-rbind(thermal_2022_AD,thermal_2023_AD)
 
 thermal_ad_22_23 <- thermal_ad %>%
@@ -127,13 +130,13 @@ thermal_ad_22_23 <- thermal_ad %>%
 ###########################################################
 
 ###PRI DATA####
-file1 <- read_excel("06-02574 11Oct22-1455_file1.xlsx")
+file1 <- read_excel("data/raw_data/06-02574 11Oct22-1455_file1.xlsx")
 file1$`06-02574` <- as.POSIXct(file1$`06-02574`, origin = "1970-01-01", tz = "UTC")
 
-file2 <- read_excel("06-02574 26May23-1259_file2.xlsx")
+file2 <- read_excel("data/raw_data/06-02574 26May23-1259_file2.xlsx")
 file2$`06-02574` <- as.POSIXct(file2$`06-02574`, origin = "1970-01-01", tz = "UTC")
 
-file3 <- read_excel("06-02574 04Dec23-1114_file3.xlsx")
+file3 <- read_excel("data/raw_data/06-02574 04Dec23-1114_file3.xlsx")
 file3$`06-02574` <- as.POSIXct(file3$`06-02574`, origin = "1970-01-01", tz = "UTC")
 
 merged_data <- bind_rows(file1, file2, file3)
@@ -232,85 +235,33 @@ f_srs_data<- srs_data%>%
                 PRI_PORT6, P810_PORT5, P650_PORT5, NDVI_PORT5 , P810_PORT2 , P650_PORT2 , 
                 NDVI_PORT2 , NIRv_PORT5 , NIRv_PORT2 ) 
 
-
-################rgb############
-##2022##
-setwd('C:/Users/dafna/Desktop/Bigelow_22_23/data/raw_data')
-load('VI.data.Rdata')
-table22_larg<-do.call(rbind,VI.data)
-table22_larg$ID<-row.names(table22_larg)
-table22_larg$ID <- as.numeric(as.character(table22_larg$ID))
-table22_larg$ID <- floor(table22_larg$ID)
-
-
-load('VI.data23.Rdata')
-table23_larg<-do.call(rbind,VI.data)
-table23_larg$ID<-row.names(table23_larg)
-table23_larg$ID <- as.numeric(as.character(table23_larg$ID))
-table23_larg$ID <- floor(table23_larg$ID)
-
-table22_larg <- table22_larg %>%
-  mutate(GRVI =  (g.av-r.av)/ (g.av+r.av))
-table22_larg <- table22_larg %>%
-  mutate(GCC =  (g.av)/ (r.av+g.av+b.av))
-table22_larg$origin <- "table22"
-
-table23_larg <- table23_larg %>%
-  mutate(GRVI =  (g.av-r.av)/ (g.av+r.av))
-table23_larg <- table23_larg %>%
-  mutate(GCC =  (g.av)/ (r.av+g.av+b.av))
-table23_larg$origin <- "table23"
-
-RGB_22_23_raw <- rbind(table22_larg, table23_larg)
-RGB_22_23_raw<- RGB_22_23_raw  %>%
-  filter(ID == 1)
-################
-##CREATING NORMELIZED VALUE###
-start_date <- as.Date("2022-05-27")
-end_date <- as.Date("2022-10-31")
-# Trim the table to start from the specified date
-table22_trimmed <- subset(table22_larg, date >= start_date& date <= end_date)
-
-##NORMELIZE 2022##
-min_gcc_value_22 <- min(table22_trimmed$GCC, na.rm = TRUE)
-max_gcc_value_22 <- max(table22_trimmed$GCC, na.rm = TRUE)
-min_grvi_value_22 <- min(table22_trimmed$GRVI, na.rm = TRUE)
-max_grvi_value_22 <- max(table22_trimmed$GRVI, na.rm = TRUE)
-table22_trimmed$normalized_gcc <- (table22_trimmed$GCC - min_gcc_value_22) / (max_gcc_value_22 - min_gcc_value_22)
-table22_trimmed$normalized_grvi <- (table22_trimmed$GRVI - min_grvi_value_22) / (max_grvi_value_22 - min_grvi_value_22)
-
-
-####NORMELIZED2023###
-##NORMELIZE 2022##
-min_gcc_value_23 <- min(table23_larg$GCC, na.rm = TRUE)
-max_gcc_value_23 <- max(table23_larg$GCC, na.rm = TRUE)
-min_grvi_value_23 <- min(table23_larg$GRVI, na.rm = TRUE)
-max_grvi_value_23 <- max(table23_larg$GRVI, na.rm = TRUE)
-table23_larg$normalized_gcc <- (table23_larg$GCC - min_gcc_value_23) / (max_gcc_value_23 - min_gcc_value_23)
-table23_larg$normalized_grvi <- (table23_larg$GRVI - min_grvi_value_23) / (max_grvi_value_23 - min_grvi_value_23)
-
-RGB_22 <- table22_trimmed %>%
-  filter(ID == 1)
-
-RGB_23 <- table23_larg %>%
-  filter(ID == 1)
-
-
-
-RGB_22_23_all <- rbind(RGB_22, RGB_23)
-
-RGB_22_23 <- RGB_22_23_all %>%
-  select(date, doy, GRVI, GCC, normalized_gcc, normalized_grvi) %>%
-  mutate(Time = as.POSIXct(date, format = "%Y-%m-%d %H:%M:%S", tz = "UTC"))
-
-
-# Save RGB_22_23 as a CSV file
-write.csv(RGB_22_23, file = "RGB_with_normalization.csv", row.names = FALSE)
+######
 
 # Save RGB_22_23_raw as a CSV file
-write.csv(RGB_22_23_raw, file = "RGB_raw.csv", row.names = FALSE)
+write.csv(thermal_ad_22_23, file = "Thermal_allday.csv", row.names = FALSE)
 
 # Save RGB_22_23_raw as a CSV file
+write.csv(tower_data_selected, file = "tower_selected.csv", row.names = FALSE)
+
+# Save RGB_22_23_raw as a CSV file
+write.csv( f_srs_data, file = "SRS_selected.csv", row.names = FALSE)
+
+# Save RGB_22_23_raw as a CSV file
+write.csv(sf_data, file = "sap_flow.csv", row.names = FALSE)
+
+thermal_tower <- inner_join(thermal_ad_22_23, tower_data_selected, by = "Time")
+
+# Then, join the result with f_srs_data
+thrmal_tower_srs <- inner_join(thermal_tower, f_srs_data, by = "Time")
+
+# Then, join the result with f_srs_data
+thrmal_tower_srs_sf <- inner_join(thrmal_tower_srs, sf_data, by = "Time")
+
+# Finally, join the result with sf_data
+all_data = thrmal_tower_srs_sf 
+write.csv("data/clean_data/alldata_22_23", file = "all_data", row.names = FALSE)
+
+#####old####
 write.csv(thermal_ad_22_23, file = "Thermal_allday.csv", row.names = FALSE)
 
 # Save RGB_22_23_raw as a CSV file
